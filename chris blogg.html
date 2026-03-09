@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinePulse | Interactive Movie Blog</title>
+    <style>
+        /* CSS STYLES */
+        :root {
+            --primary: #e50914; /* Cinema Red */
+            --bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text: #ffffff;
+            --gray: #aaaaaa;
+            --modal-bg: rgba(0, 0, 0, 0.85);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: rgba(0,0,0,0.9);
+            padding: 1.2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-size: 1.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+
+        /* Auth Button in Header */
+        #auth-status { cursor: pointer; color: var(--primary); font-weight: bold; }
+
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 20px; }
+
+        /* Movie Card */
+        .movie-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .poster-container {
+            width: 100%;
+            height: 450px;
+            background: linear-gradient(to bottom, transparent, var(--card-bg)), 
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 30px;
+        }
+
+        .movie-info { padding: 30px; }
+        .tag { background: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        
+        /* Interactive Elements */
+        .actions { display: flex; gap: 15px; margin: 20px 0; }
+        
+        button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-main { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
+        .btn-action { background: var(--primary); color: white; width: auto; }
+        .btn-outline { background: transparent; border: 1px solid white; color: white; }
+        .btn-outline.active { background: white; color: black; }
+
+        /* Star Rating */
+        .rating-system { margin: 20px 0; }
+        .star { font-size: 2rem; cursor: pointer; color: #444; transition: 0.2s; }
+        .star.selected { color: #f1c40f; }
+
+        /* Comments */
+        .comment-section { background: #111; padding: 20px; border-top: 1px solid #333; }
+        #comment-list { margin-bottom: 20px; }
+        .comment-item { border-bottom: 1px solid #222; padding: 10px 0; }
+        .comment-item small { color: var(--gray); }
+
+        .comment-form textarea {
+            width: 100%;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-sizing: border-box;
+            resize: none;
+        }
+
+        /* --- AUTH MODAL STYLES --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--modal-bg);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #222;
+            padding: 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h2 { margin-top: 0; color: var(--primary); }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #333;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .modal-content p { font-size: 0.9rem; color: var(--gray); margin-top: 15px; }
+        .toggle-link { color: var(--primary); cursor: pointer; text-decoration: underline; }
+        .close-modal { position: absolute; top: 20px; right: 20px; color: white; cursor: pointer; font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">CinePulse</div>
+    <div id="auth-status" onclick="openModal()">Login / Sign Up</div>
+</header>
+
+<div class="container">
+    <article class="movie-card">
+        <div class="poster-container">
+            <div>
+                <span class="tag">SCI-FI / DRAMA</span>
+                <h1 style="margin: 10px 0;">The Digital Frontier (2026)</h1>
+            </div>
+        </div>
+
+        <div class="movie-info">
+            <p><strong>Review:</strong> An immersive journey into the silicon valley of the future. The cinematography is breathtaking, though the plot drags in the second act. A must-watch for tech enthusiasts.</p>
+            
+            <div class="actions">
+                <button class="btn-action" onclick="alert('Playing Trailer...')">▶ Watch Trailer</button>
+                <button class="btn-outline" id="watchlistBtn" onclick="toggleWatchlist()">+ Add to Watchlist</button>
+            </div>
+
+            <div class="rating-system">
+                <p>Rate this movie:</p>
+                <span class="star" onclick="rate(1)">★</span>
+                <span class="star" onclick="rate(2)">★</span>
+                <span class="star" onclick="rate(3)">★</span>
+                <span class="star" onclick="rate(4)">★</span>
+                <span class="star" onclick="rate(5)">★</span>
+                <span id="rating-text" style="margin-left:10px; color: var(--gray);">Click to rate</span>
+            </div>
+        </div>
+
+        <section class="comment-section">
+            <h3>User Discussion</h3>
+            <div id="comment-list">
+                <div class="comment-item">
+                    <strong>MovieBuff99:</strong> Spot on review! The visual effects were insane.
+                </div>
+            </div>
+
+            <form class="comment-form" id="commentForm">
+                <textarea id="commentInput" rows="3" placeholder="Add your thoughts..." required></textarea>
+                <button type="submit" class="btn-action" style="margin-top:10px;">Post Comment</button>
+            </form>
+        </section>
+    </article>
+</div>
+
+<div class="modal-overlay" id="authModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">Login</h2>
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn-main" onclick="handleAuth()" id="submitBtn">Login</button>
+        
+        <p id="toggleText">Don't have an account? <span class="toggle-link" onclick="toggleAuthMode()">Sign Up</span></p>
+        <p style="cursor:pointer; text-decoration: underline;" onclick="closeModal()">Close</p>
+    </div>
+</div>
+
+<script>
+    // --- AUTHENTICATION LOGIC ---
+    let isLoggedIn = false;
+    let currentUser = "";
+    let isLoginMode = true;
+
+    function openModal() {
+        document.getElementById('authModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+
+    function toggleAuthMode() {
+        isLoginMode = !isLoginMode;
+        document.getElementById('modalTitle').innerText = isLoginMode ? "Login" : "Sign Up";
+        document.getElementById('submitBtn').innerText = isLoginMode ? "Login" : "Create Account";
+        document.getElementById('toggleText').innerHTML = isLoginMode ? 
+            "Don't have an account? <span class='toggle-link' onclick='toggleAuthMode()'>Sign Up</span>" : 
+            "Already have an account? <span class='toggle-link' onclick='toggleAuthMode()'>Login</span>";
+    }
+
+    function handleAuth() {
+        const email = document.getElementById('email').value;
+        if(email) {
+            isLoggedIn = true;
+            currentUser = email.split('@')[0]; // Simple username from email
+            document.getElementById('auth-status').innerText = `Hello, ${currentUser} (Logout)`;
+            document.getElementById('auth-status').onclick = logout;
+            closeModal();
+        } else {
+            alert("Please enter an email");
+        }
+    }
+
+    function logout() {
+        isLoggedIn = false;
+        currentUser = "";
+        document.getElementById('auth-status').innerText = "Login / Sign Up";
+        document.getElementById('auth-status').onclick = openModal;
+        location.reload(); // Reset states
+    }
+
+    // --- INTERACTIVE FEATURES (PROTECTED) ---
+
+    function toggleWatchlist() {
+        if(!isLoggedIn) return openModal();
+        
+        const btn = document.getElementById('watchlistBtn');
+        if (btn.innerText === "+ Add to Watchlist") {
+            btn.innerText = "✓ In Watchlist";
+            btn.classList.add('active');
+        } else {
+            btn.innerText = "+ Add to Watchlist";
+            btn.classList.remove('active');
+        }
+    }
+
+    function rate(n) {
+        if(!isLoggedIn) return openModal();
+
+        const stars = document.querySelectorAll('.star');
+        stars.forEach((star, index) => {
+            if (index < n) star.classList.add('selected');
+            else star.classList.remove('selected');
+        });
+        document.getElementById('rating-text').innerText = `You rated this ${n}/5 stars!`;
+    }
+
+    document.getElementById('commentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if(!isLoggedIn) {
+            openModal();
+            return;
+        }
+
+        const input = document.getElementById('commentInput');
+        const list = document.getElementById('comment-list');
+        
+        const newDiv = document.createElement('div');
+        newDiv.className = 'comment-item';
+        newDiv.innerHTML = `<strong>${currentUser}:</strong> ${input.value}`;
+        
+        list.appendChild(newDiv);
+        input.value = ''; 
+    });
+</script>
+
+</body>
+</html>
